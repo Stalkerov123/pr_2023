@@ -130,12 +130,6 @@ def prm_auto():
     else:
         message_prm.set('Ваши заметки закрыты')
 
-
-def delete_note():
-    conn = sqlite3.connect("demo_2.db")
-    cur = conn.cursor()
-    cur.execute('DELETE FROM notes WHERE username = "123" AND note = "1232"')
-    conn.commit()
     
 def notes():
     log_form.after(1, log_form.destroy())
