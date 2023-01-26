@@ -5,7 +5,7 @@ from tkinter.messagebox import *
 from tkinter.scrolledtext import ScrolledText
 
 
-conn = sqlite3.connect("demo_2.db")
+conn = sqlite3.connect("demo_3.db")
 print("Успешное подключение к БД")
 conn.execute("""
     CREATE TABLE IF NOT EXISTS users(
@@ -17,7 +17,7 @@ conn.execute("""
 
 conn.execute("""
     CREATE TABLE IF NOT EXISTS notes(
-        USERNAME TEXT NOT NULL,
+        USERNAME TEXT NOT NULL REFERENCES users,
         NOTE TEXT NOT NULL
     )
 
@@ -27,7 +27,7 @@ def reg():
         
     log_name = username.get()
     pass_word = password.get()
-    conn =  sqlite3.connect('demo_2.db')
+    conn =  sqlite3.connect('demo_3.db')
     cursor = conn.execute(f'SELECT USERNAME FROM users WHERE USERNAME = "{log_name}" ')
     if cursor.fetchone() is None:
         with conn:
@@ -43,7 +43,7 @@ def log():
     if log_name == '' or pass_word == '':
         message.set("Введите логин и пароль!")
     else:
-        conn = sqlite3.connect('demo_2.db')
+        conn = sqlite3.connect('demo_3.db')
         cursor = conn.execute('SELECT * FROM users WHERE USERNAME="%s" and PASSWORD="%s"' % (log_name,pass_word, ))
         if cursor.fetchone():
             message.set("Успешный вход")
@@ -60,8 +60,8 @@ def unpack_tuple(k):
 def search_notes():
     txt_2.configure(state=NORMAL)
     txt_2.delete("1.0", END)
-    un = rrr.get()
-    conn = sqlite3.connect("demo_2.db")
+    un = search_uname.get()
+    conn = sqlite3.connect("demo_3.db")
     curs = conn.cursor()
     curs.execute('SELECT parametr FROM users WHERE username == ?', (un, ))
     prm = curs.fetchone()
@@ -78,7 +78,7 @@ def search_notes():
 def notes_me_d():
     txt.configure(state=NORMAL)
     uname_n = username.get()
-    conn = sqlite3.connect("demo_2.db")
+    conn = sqlite3.connect("demo_3.db")
     cur = conn.execute('SELECT note FROM notes WHERE username == ?', (uname_n, ))
     res = cur.fetchall()
     for r_1 in res:
@@ -89,7 +89,7 @@ def create_note():
     txt.configure(state=NORMAL)
     note = note_create.get()
     un = username.get()
-    conn = sqlite3.connect("demo_2.db")
+    conn = sqlite3.connect("demo_3.db")
     with conn:
         conn.execute('INSERT INTO notes VALUES(?, ?)', (un, note))
         conn.commit()
@@ -100,7 +100,7 @@ def create_note():
 def open_parametr():
     un = username.get()
 
-    conn = sqlite3.connect("demo_2.db")
+    conn = sqlite3.connect("demo_3.db")
     cur = conn.cursor()
     cur.execute(f'UPDATE users SET parametr = {1} WHERE username LIKE "{un}"')
     conn.commit()
@@ -110,7 +110,7 @@ def open_parametr():
 def close_parametr():
     un = username.get()
 
-    conn = sqlite3.connect("demo_2.db")
+    conn = sqlite3.connect("demo_3.db")
     cur = conn.cursor()
     cur.execute(f'UPDATE users SET parametr = {0} WHERE username LIKE "{un}"')
     conn.commit()
@@ -120,7 +120,7 @@ def close_parametr():
 def prm_auto():
     un = username.get()
 
-    conn = sqlite3.connect("demo_2.db")
+    conn = sqlite3.connect("demo_3.db")
     cur = conn.cursor()
     cur.execute('SELECT parametr FROM users WHERE username == ?', (un, ))
     rdw = cur.fetchone()
@@ -150,46 +150,46 @@ def notes():
     style.configure('lab.TLabel', padding=10)
     style.configure('search.TButton', padding=4)
 
-    fr = ttk.Notebook()
-    fr.pack(fill=BOTH, expand=True)
-    ffr_1 = Frame(fr, bg='#3C3232')
-    ffr_2 = Frame(fr, bg='#3C3232')
-    ffr_3 = Frame(fr, bg='#3C3232')
-    fr.add(ffr_1, text='Заметки')
-    fr.add(ffr_2, text='Поиск')
-    fr.add(ffr_3, text='Настройки')
-    global note_create, txt, message_prm, txt_2, rrr
-
+    container = ttk.Notebook()
+    container.pack(fill=BOTH, expand=True)
+    notes_page = Frame(container, bg='#3C3232')
+    search_page = Frame(container, bg='#3C3232')
+    settings_page = Frame(container, bg='#3C3232')
+    container.add(notes_page, text='Заметки')
+    container.add(search_page, text='Поиск')
+    container.add(settings_page, text='Настройки')
+    
+    global note_create, txt, message_prm, txt_2, search_uname
     message_prm = StringVar()
     note_create = StringVar()
-    rrr = StringVar()
+    search_uname = StringVar()
 
-    txt = ScrolledText(ffr_1, width=50, height=30, bg='#3C3F43', foreground='white', wrap='word')
+    txt = ScrolledText(notes_page, width=50, height=30, bg='#3C3F43', foreground='white', wrap='word')
     txt.place(x=0, y=0)
     txt.configure(state=DISABLED)
 
-    txt_2 = ScrolledText(ffr_2, width=50, height=30, bg='#3C3F43', foreground='white', wrap='word')
+    txt_2 = ScrolledText(search_page, width=50, height=30, bg='#3C3F43', foreground='white', wrap='word')
     txt_2.place(x=0, y=0)
     txt_2.configure(state=DISABLED)
 
-    ttxt = Text(ffr_2, width=52, height=1, bg='#3C3F43', foreground='white', wrap='word')
+    ttxt = Text(search_page, width=52, height=1, bg='#3C3F43', foreground='white', wrap='word')
     ttxt.place(x=1, y=486)
     ttxt.insert(1.0, 'Введите ник пользователя, чьи заметки хотите увидеть')
     ttxt.configure(state=DISABLED)
 
-    update_parametr_btn_2 = ttk.Button(ffr_3, text='Открыть заметки', width=26, command=open_parametr, style='open.TButton')
+    update_parametr_btn_2 = ttk.Button(settings_page, text='Открыть заметки', width=26, command=open_parametr, style='open.TButton')
     update_parametr_btn_2.place(x=0, y=41)
-    update_parametr_btn = ttk.Button(ffr_3, text='Закрыть заметки', width=26, command=close_parametr, style='close.TButton')
+    update_parametr_btn = ttk.Button(settings_page, text='Закрыть заметки', width=26, command=close_parametr, style='close.TButton')
     update_parametr_btn.place(x=0, y=73)
-    create_note_output = ttk.Entry(ffr_1, textvariable=note_create, width=35, font=("Arial",12,"bold"))
-    create_note_output.place(x=0, y=485)
-    btn_create_note = ttk.Button(ffr_1, text="Добавить заметку", width=30, command=create_note, style='one.TButton')
+    create_note_input = ttk.Entry(notes_page, textvariable=note_create, width=35, font=("Arial",12,"bold"))
+    create_note_input.place(x=0, y=485)
+    btn_create_note = ttk.Button(notes_page, text="Добавить заметку", width=30, command=create_note, style='one.TButton')
     btn_create_note.place(x=70, y=520)
-    label_parametr = ttk.Label(ffr_3, textvariable=message_prm, background='#4B535F', foreground='white', width=25, style='lab.TLabel')
+    label_parametr = ttk.Label(settings_page, textvariable=message_prm, background='#4B535F', foreground='white', width=25, style='lab.TLabel')
     label_parametr.place(x=0, y=0)
-    search_note_entry = ttk.Entry(ffr_2, textvariable=rrr, width=22, font=("Arial",12,"bold"))
+    search_note_entry = ttk.Entry(search_page, textvariable=search_uname, width=22, font=("Arial",12,"bold"))
     search_note_entry.place(x=15, y=510)
-    search_btn = ttk.Button(ffr_2, text='Поиск', width=28, style='search.TButton', command=search_notes)
+    search_btn = ttk.Button(search_page, text='Поиск', width=28, style='search.TButton', command=search_notes)
     search_btn.place(x=230, y=510)
 
     notes_me_d()
