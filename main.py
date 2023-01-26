@@ -130,16 +130,15 @@ def prm_auto():
     else:
         message_prm.set('Ваши заметки закрыты')
 
+def destroy_widjets():
+    d_objects = [log_form, uname_form, uname_pole,
+                pass_form, pass_pole, message_form,
+                login_btn, reg_btn]
+    for d_name in d_objects:
+        d_name.after(1, d_name.destroy())
     
 def notes():
-    log_form.after(1, log_form.destroy())
-    uname_form.after(1, uname_form.destroy())
-    uname_pole.after(1, uname_pole.destroy())
-    pass_form.after(1, pass_form.destroy())
-    pass_pole.after(1, pass_pole.destroy())
-    message_form.after(1, message_form.destroy())
-    login_btn.after(1, login_btn.destroy())
-    reg_btn.after(1, reg_btn.destroy())
+    destroy_widjets()
     login_window.geometry("425x575-130-230")
     
     style = ttk.Style()
@@ -199,11 +198,11 @@ def notes():
 
 def main():
     global login_window, log_form, uname_form, uname_pole, pass_form 
-    global pass_pole, message_form, login_btn, reg_btn
+    global pass_pole, message_form, login_btn, reg_btn, username_r
     
     login_window = Tk()
     login_window.title("Demo")
-    login_window.geometry("430x250+500+230")
+    login_window.geometry("370x180+500+230")
     login_window["bg"] = "#1C2833"
     login_window.resizable(False, False)
 
@@ -226,9 +225,9 @@ def main():
     message_form = Label(login_window, text="", textvariable=message, bg="#1C2833",fg="white",font=("Arial",12,"bold"))
     message_form.place(x=20,y=120)
     login_btn = Button(login_window, text="Sign in", width=16, height=1, command=log, bg="#5D9525",fg="white",font=("Arial",12,"bold"))
-    login_btn.place(x=22, y=170)
+    login_btn.place(x=1, y=140)
     reg_btn = Button(login_window, text="Sign up", width=16, height=1, command=reg, bg="#097197",fg="white",font=("Arial",12,"bold"))
-    reg_btn.place(x=220, y=170)
+    reg_btn.place(x=199, y=140)
     
     login_window.mainloop()
 
