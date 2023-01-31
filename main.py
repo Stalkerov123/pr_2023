@@ -5,7 +5,7 @@ from tkinter.messagebox import *
 from tkinter.scrolledtext import ScrolledText
 
 
-conn = sqlite3.connect("demo_4.db")
+conn = sqlite3.connect("demo_5.db")
 print("Успешное подключение к БД")
 conn.execute("""
     CREATE TABLE IF NOT EXISTS users(
@@ -22,12 +22,11 @@ conn.execute("""
     )
 
 """)
-
 def reg():
-        
+
     log_name = username.get()
     pass_word = password.get()
-    conn =  sqlite3.connect('demo_4.db')
+    conn =  sqlite3.connect('demo_5.db')
     cursor = conn.execute(f'SELECT USERNAME FROM users WHERE USERNAME = "{log_name}" ')
     if cursor.fetchone() is None:
         with conn:
@@ -43,13 +42,13 @@ def log():
     if log_name == '' or pass_word == '':
         message.set("Введите логин и пароль!")
     else:
-        conn = sqlite3.connect('demo_4.db')
-        cursor = conn.execute('SELECT * FROM users WHERE USERNAME="%s" and PASSWORD="%s"' % (log_name,pass_word, ))
+        conn = sqlite3.connect('demo_5.db')
+        cursor = conn.execute('SELECT * FROM users WHERE USERNAME="%s" AND PASSWORD="%s"' % (log_name,pass_word, ))
         if cursor.fetchone():
             message.set("Успешный вход")
             notes()
         else:
-            message.set("Неверный пароль или логин!")
+            message.set("Неверный логин или пароль!")
 
 #ниже часть функций, который относятся к странице заметок
 
@@ -61,7 +60,7 @@ def search_notes():
     txt_2.configure(state=NORMAL)
     txt_2.delete("1.0", END)
     un = search_uname.get()
-    conn = sqlite3.connect("demo_4.db")
+    conn = sqlite3.connect("demo_5.db")
     curs = conn.cursor()
     curs.execute('SELECT parametr FROM users WHERE username == ?', (un, ))
     prm = curs.fetchone()
@@ -74,11 +73,11 @@ def search_notes():
     else:
         showerror(title='Ошибка', message='Пользователь закрыл свои заметки, вы не можете их просматривать')
     txt_2.configure(state=DISABLED)
-
+    
 def notes_me_d():
     txt.configure(state=NORMAL)
     uname_n = username.get()
-    conn = sqlite3.connect("demo_4.db")
+    conn = sqlite3.connect("demo_5.db")
     cur = conn.execute('SELECT note FROM notes WHERE username == ?', (uname_n, ))
     res = cur.fetchall()
     for r_1 in res:
@@ -89,7 +88,7 @@ def create_note():
     txt.configure(state=NORMAL)
     note = note_create.get()
     un = username.get()
-    conn = sqlite3.connect("demo_4.db")
+    conn = sqlite3.connect("demo_5.db")
     with conn:
         conn.execute('INSERT INTO notes VALUES(?, ?)', (un, note))
         conn.commit()
@@ -100,7 +99,7 @@ def create_note():
 def open_parametr():
     un = username.get()
 
-    conn = sqlite3.connect("demo_4.db")
+    conn = sqlite3.connect("demo_5.db")
     cur = conn.cursor()
     cur.execute(f'UPDATE users SET parametr = {1} WHERE username LIKE "{un}"')
     conn.commit()
@@ -110,7 +109,7 @@ def open_parametr():
 def close_parametr():
     un = username.get()
 
-    conn = sqlite3.connect("demo_4.db")
+    conn = sqlite3.connect("demo_5.db")
     cur = conn.cursor()
     cur.execute(f'UPDATE users SET parametr = {0} WHERE username LIKE "{un}"')
     conn.commit()
@@ -120,7 +119,7 @@ def close_parametr():
 def prm_auto():
     un = username.get()
 
-    conn = sqlite3.connect("demo_4.db")
+    conn = sqlite3.connect("demo_5.db")
     cur = conn.cursor()
     cur.execute('SELECT parametr FROM users WHERE username == ?', (un, ))
     rdw = cur.fetchone()
@@ -130,7 +129,7 @@ def prm_auto():
     else:
         message_prm.set('Ваши заметки закрыты')
 
-def destroy_widjets():
+def destroy_widgets():
     d_objects = [log_form, uname_form, uname_pole,
                 pass_form, pass_pole, message_form,
                 login_btn, reg_btn]
@@ -138,7 +137,7 @@ def destroy_widjets():
         d_name.after(1, d_name.destroy())
     
 def notes():
-    destroy_widjets()
+    destroy_widgets()
     login_window.geometry("425x575-130-230")
     
     style = ttk.Style()
@@ -196,13 +195,13 @@ def notes():
 
 #конец части кода с функциями для страницы заметок
 
-def main():
+def login():
     global login_window, log_form, uname_form, uname_pole, pass_form 
     global pass_pole, message_form, login_btn, reg_btn, username_r
     
     login_window = Tk()
     login_window.title("Demo")
-    login_window.geometry("370x180+500+230")
+    login_window.geometry("480x190+500+230")
     login_window["bg"] = "#1C2833"
     login_window.resizable(False, False)
 
@@ -216,19 +215,19 @@ def main():
     log_form.pack()
     uname_form = Label(login_window, text="Username ",bg="#1C2833", fg="white",font=("Arial",12,"bold"))
     uname_form.place(x=20,y=40)
-    uname_pole = Entry(login_window, textvariable=username, width=25, bg="#9D9CAF",fg="white",font=("Arial",12,"bold"))
+    uname_pole = Entry(login_window, textvariable=username, width=30, bg="#9D9CAF",fg="white",font=("Arial",12,"bold"))
     uname_pole.place(x=120,y=42)
     pass_form = Label(login_window, text="Password ",bg="#1C2833", fg="white",font=("Arial",12,"bold"))
     pass_form.place(x=20,y=80)
-    pass_pole = Entry(login_window, textvariable=password,show="*", width=25, bg="#9D9CAF",fg="white",font=("Arial",12,"bold"))
+    pass_pole = Entry(login_window, textvariable=password,show="*", width=30, bg="#9D9CAF",fg="white",font=("Arial",12,"bold"))
     pass_pole.place(x=120,y=82)
     message_form = Label(login_window, text="", textvariable=message, bg="#1C2833",fg="white",font=("Arial",12,"bold"))
-    message_form.place(x=20,y=120)
+    message_form.place(x=1,y=120)
     login_btn = Button(login_window, text="Sign in", width=16, height=1, command=log, bg="#5D9525",fg="white",font=("Arial",12,"bold"))
-    login_btn.place(x=1, y=140)
+    login_btn.place(x=20, y=150)
     reg_btn = Button(login_window, text="Sign up", width=16, height=1, command=reg, bg="#097197",fg="white",font=("Arial",12,"bold"))
-    reg_btn.place(x=199, y=140)
+    reg_btn.place(x=290, y=150)
     
     login_window.mainloop()
 
-main()
+login()
